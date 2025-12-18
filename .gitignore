@@ -1,0 +1,18 @@
+# Cursor IDE files
+debug.log
+worktrees.json
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*~
+*.bak
+*.swp
+
+# Temporary files
+*.tmp
+.cache/
+
