@@ -8,7 +8,7 @@ When reviewing a README file:
 
 1. **Read the README and the actual code** - Compare documentation with implementation
 2. **Check all code snippets** - Ensure they are functional and complete
-3. **Validate imports and function signatures** - Match against actual code
+3. **Validate imports and function signatures** - Match against actual code (use concise signatures)
 4. **Fix issues** - Update README to follow best practices below
 
 ## Review Checklist
@@ -23,7 +23,7 @@ When reviewing a README file:
 
 ### 2. Code Snippets Quality ⚠️ CRITICAL
 - [ ] **NO isolated, non-functional snippets** - Remove code that uses undefined variables or incomplete examples
-- [ ] **Function signatures instead of broken snippets** - For component sections, show function signatures with parameters rather than incomplete code
+- [ ] **Function signatures instead of broken snippets** - For component sections, show concise function signatures with important parameters rather than incomplete code
 - [ ] **Unified working examples** - Create complete, functional examples that show components working together
 - [ ] All imports are present and correct at the top of each example
 - [ ] All variables are defined before use (no undefined variables like `instance`, `obj`, `data` without initialization)
@@ -32,6 +32,7 @@ When reviewing a README file:
 ### 3. Code Validation
 - [ ] All imports can be resolved (check against `__init__.py`, `package.json`, `Cargo.toml`, or equivalent)
 - [ ] Function signatures match actual implementations (read the source files)
+- [ ] **Function signatures are concise** - Show only important parameters and defaults, omit detailed type hints for readability
 - [ ] Parameter names and defaults match the code
 - [ ] Code examples follow patterns used in actual codebase
 - [ ] Examples include proper error handling and resource cleanup (try/finally, close(), cleanup(), etc.)
@@ -60,6 +61,8 @@ When reviewing a README file:
 - [ ] Code examples can be copied and run directly (with proper setup)
 - [ ] Complex examples are broken down with comments explaining each step
 - [ ] Examples use consistent naming conventions with the codebase
+- [ ] **No duplicate examples** - Similar examples are consolidated with links to source of truth
+- [ ] **Proper example hierarchy** - Detailed examples in component READMEs, quick examples + links in parent READMEs
 
 ## Common Issues and Fixes
 
@@ -73,8 +76,8 @@ result = obj.process(data)  # 'data' is undefined
 
 **Solution:** Replace with function signatures or create unified working examples
 ```python
-# GOOD: Function signature (for component sections)
-- `process(data: str, options: dict = None) -> Result` - Process data with optional configuration
+# GOOD: Function signature (for component sections) - concise, show only important parameters
+- `process(data, options=None)` - Process data with optional configuration
 
 # GOOD: Complete working example (for usage examples section)
 from mypackage import MyClass
@@ -92,6 +95,28 @@ try:
 finally:
     obj.cleanup()
 ```
+
+### Issue: Overly detailed function signatures
+**Problem:** Function signatures include full type hints making them hard to read
+```python
+# BAD - Too verbose
+- `process(data: str, options: Optional[Dict[str, Any]] = None, logger_instance: Optional[logging.Logger] = None) -> Result`
+```
+
+**Solution:** Use concise signatures showing only important parameters and defaults
+```python
+# GOOD - Concise and readable
+- `process(data, options=None)` - Process data with optional configuration
+- `is_context_full(llm, context_threshold=0.95)` - Check if context usage exceeds threshold
+- `generate_and_stream_response(llm, prompt, temperature=0.1, max_tokens=200)` - Generate and stream response
+```
+
+**Guidelines for concise signatures:**
+- Include parameter names and important defaults
+- Omit detailed type hints (e.g., `Optional[Dict[str, Any]]` → just show the parameter)
+- Omit return type annotations unless critical for understanding
+- Omit optional logger/error handling parameters unless they're commonly used
+- Focus on parameters users will actually set
 
 ### Issue: Missing imports
 **Problem:** Code examples don't show all required imports
@@ -143,23 +168,87 @@ try {
 **Problem:** Examples don't show where code fits in a larger application
 **Solution:** Add comments explaining context and show how pieces fit together
 
+### Issue: Duplicate examples across READMEs
+**Problem:** Same code examples appear in multiple README files, making maintenance difficult
+**Solution:** Consolidate duplicates into a single location and link from other READMEs
+
+**Consolidation Strategy:**
+1. **Identify duplicates** - Search for similar code examples across related READMEs
+2. **Choose source of truth** - Keep the most detailed/complete example in the component-specific README
+3. **Replace duplicates** - In parent/general READMEs, replace full examples with:
+   - Quick-start snippets (minimal, functional examples)
+   - Links to detailed examples in component-specific READMEs
+4. **Maintain consistency** - Follow this hierarchy:
+   - **Component-specific READMEs** (`module/README.md`) → Full detailed examples
+   - **Parent module READMEs** (`parent/README.md`) → Quick examples + links
+   - **Main README** (`README.md`) → Quick examples + links
+
+**Example Consolidation:**
+
+**Before (Duplicate):**
+```python
+# In gen_ai_apps/README.md
+# Full 30-line VoiceInteractionManager example
+
+# In gen_ai_utils/README.md
+# Same full 30-line VoiceInteractionManager example
+
+# In gen_ai_utils/voice_processing/README.md
+# Same full 30-line VoiceInteractionManager example
+```
+
+**After (Consolidated):**
+```python
+# In gen_ai_apps/README.md - Quick example + link
+For detailed examples, see: [Voice Processing Examples](gen_ai_utils/voice_processing/README.md#usage)
+
+# Quick Start:
+manager = VoiceInteractionManager(
+    title="My App",
+    on_audio_ready=lambda audio: print(f"Audio: {len(audio)} samples")
+)
+manager.run()
+
+# In gen_ai_utils/README.md - Quick example + link
+See: [Voice Processing Module Documentation](voice_processing/README.md#usage)
+
+# In gen_ai_utils/voice_processing/README.md - Full detailed example (source of truth)
+# Complete example with all callbacks, error handling, etc.
+```
+
+**Guidelines:**
+- Keep detailed examples in component-specific READMEs (most specific location)
+- Use quick-start snippets in parent READMEs for immediate reference
+- Always include links to detailed examples
+- Ensure quick-start examples are functional (can be copied and run)
+- Document the consolidation in the review process
+
 ## Review Process
 
 1. **Read the README** - Understand structure and content
 2. **Read the actual source files** - Check implementation files mentioned in the README
 3. **Check code alignment** - Compare documentation with implementation
-   - Verify function signatures match
+   - Verify function signatures match (using concise format)
    - Check that imports are correct
    - Ensure parameter names match
-   - Verify return types are accurate
-4. **Validate imports** - Check package/module structure for exported functions
-5. **Test code snippets** - Verify they're syntactically correct and complete
+   - Verify return types are accurate (documented in descriptions, not signatures)
+4. **Identify duplicate examples** - Search for similar code examples across related READMEs
+   - Check parent/child README relationships
+   - Look for repeated patterns (same imports, same function calls)
+   - Identify which location should be the source of truth
+5. **Consolidate duplicates** - Apply consolidation strategy:
+   - Keep detailed examples in component-specific READMEs
+   - Replace duplicates in parent READMEs with quick examples + links
+   - Ensure all links point to correct sections (use anchor links like `#usage`)
+6. **Validate imports** - Check package/module structure for exported functions
+7. **Test code snippets** - Verify they're syntactically correct and complete
    - Check syntax with language linter/compiler
    - Ensure all variables are defined
    - Verify imports can be resolved
-6. **Compare with standards** - Check similar READMEs in the repository for consistency
-7. **Run functional tests** - Execute commands and code snippets (see Functional Testing section)
-8. **Fix issues** - Update README following the patterns above
+8. **Compare with standards** - Check similar READMEs in the repository for consistency
+9. **Run functional tests** - Execute commands and code snippets (see Functional Testing section)
+10. **Fix issues** - Update README following the patterns above
+11. **Code Verification Stage** - Verify all code snippets and generate verification report table (see Code Verification Stage section) ⚠️ FINAL STEP
 
 ## Validation Steps
 
@@ -351,6 +440,151 @@ grep -i "run from\|requires\|needs\|set\|export" "$README_FILE"
 - **Document assumptions**: Note any assumptions made during testing
 - **Skip if impractical**: Some tests may require hardware/special setup - document limitations
 
+## Code Verification Stage ⚠️ FINAL REQUIRED STEP
+
+After completing all review steps, **verify all code snippets** and generate a verification report table.
+
+### Verification Process
+
+1. **Extract all code snippets** from the README:
+   - Python code blocks (```python)
+   - Bash/shell commands (```bash, ```sh)
+   - JavaScript/TypeScript (```javascript, ```typescript)
+   - Other language-specific blocks
+   - Inline code examples
+
+2. **For each snippet, perform verification:**
+   - **Syntax check**: Verify code is syntactically correct
+   - **Import validation**: Check all imports can be resolved
+   - **Variable validation**: Ensure all variables are defined
+   - **Function signature check**: Verify function calls match actual signatures
+   - **Execution test**: If possible, run the code (with mocks/stubs for external dependencies)
+
+3. **Generate verification table** showing results for each snippet
+
+### Verification Table Format
+
+After verification, output a table in this format:
+
+| Snippet # | Location     | Type   | Description                     | Status    | Notes                                      |
+| --------- | ------------ | ------ | ------------------------------- | --------- | ------------------------------------------ |
+| 1         | Line 25-35   | Python | VoiceInteractionManager example | ✅ Pass    | All imports valid, syntax correct          |
+| 2         | Line 45-50   | Bash   | Installation command            | ✅ Pass    | Command executes successfully              |
+| 3         | Line 120-135 | Python | LLM streaming example           | ⚠️ Warning | Requires hardware, syntax valid            |
+| 4         | Line 200-210 | Python | Context manager example         | ❌ Fail    | Missing import: `from pathlib import Path` |
+
+**Status Values:**
+- ✅ **Pass** - Code is valid, imports work, can be executed (or would execute with proper setup)
+- ⚠️ **Warning** - Code is valid but requires special setup (hardware, environment, etc.) - document limitations
+- ❌ **Fail** - Code has errors (syntax, missing imports, undefined variables, etc.) - must fix
+
+### Verification Checklist
+
+For each code snippet, verify:
+
+- [ ] **Syntax is correct** - Code parses without syntax errors
+- [ ] **Imports are valid** - All imports can be resolved (check against actual codebase)
+- [ ] **Variables are defined** - No undefined variables (unless intentionally shown as incomplete)
+- [ ] **Function signatures match** - Function calls match actual implementations
+- [ ] **Code is executable** - Can be run (or would run with proper setup/mocks)
+- [ ] **Context is clear** - Any required setup is documented
+- [ ] **Dependencies are documented** - Required packages/modules are mentioned
+
+### Language-Specific Verification
+
+#### Python
+```bash
+# Syntax check
+python3 -m py_compile snippet.py
+
+# Import check
+python3 -c "import ast; ast.parse(open('snippet.py').read())"
+python3 -c "from package.module import function"  # Test each import
+
+# Execution test (with mocks if needed)
+python3 snippet.py
+```
+
+#### Bash/Shell
+```bash
+# Syntax check
+bash -n script.sh
+
+# Dry run (if safe)
+bash -x script.sh  # With set -x for debugging
+```
+
+#### JavaScript/TypeScript
+```bash
+# Syntax check
+node --check script.js
+# or
+tsc --noEmit script.ts
+```
+
+### Verification Report Template
+
+After completing verification, include this report in your review:
+
+```markdown
+## Code Verification Report
+
+**README File:** `path/to/README.md`
+**Review Date:** YYYY-MM-DD
+**Total Snippets:** X
+**Passed:** Y | **Warnings:** Z | **Failed:** W
+
+### Verification Results
+
+| Snippet # | Location | Type | Description | Status | Notes |
+| --------- | -------- | ---- | ----------- | ------ | ----- |
+| ...       | ...      | ...  | ...         | ...    | ...   |
+
+### Summary
+- ✅ All critical snippets verified and passing
+- ⚠️ X snippets require special setup (documented)
+- ❌ Y snippets have errors (fixed in review)
+```
+
+### Automated Verification Script Example
+
+```bash
+#!/bin/bash
+# verify_readme_snippets.sh
+
+README_FILE="$1"
+REPORT_FILE="verification_report.md"
+
+echo "## Code Verification Report" > "$REPORT_FILE"
+echo "" >> "$REPORT_FILE"
+echo "**README File:** \`$README_FILE\`" >> "$REPORT_FILE"
+echo "**Review Date:** $(date +%Y-%m-%d)" >> "$REPORT_FILE"
+echo "" >> "$REPORT_FILE"
+echo "| Snippet # | Location | Type | Description | Status | Notes |" >> "$REPORT_FILE"
+echo "|-----------|----------|------|-------------|--------|-------|" >> "$REPORT_FILE"
+
+SNIPPET_NUM=1
+
+# Extract Python snippets
+grep -n '```python' "$README_FILE" | while read -r line; do
+    LINE_NUM=$(echo "$line" | cut -d: -f1)
+    # Extract snippet and test
+    # ... verification logic ...
+    echo "| $SNIPPET_NUM | Line $LINE_NUM | Python | ... | ✅ Pass | ... |" >> "$REPORT_FILE"
+    SNIPPET_NUM=$((SNIPPET_NUM + 1))
+done
+
+# Similar for bash, javascript, etc.
+```
+
+### Important Notes
+
+- **All snippets must be verified** - No snippet should be left untested
+- **Fix failures immediately** - If a snippet fails verification, fix it before completing the review
+- **Document warnings** - If a snippet requires special setup, document it in the Notes column
+- **Include verification report** - Always include the verification table in your review output
+- **Re-verify after fixes** - If you fix snippets, re-run verification to confirm they pass
+
 ## Key Principles
 
 - **Functional over decorative** - Code examples must work, not just look good
@@ -359,6 +593,7 @@ grep -i "run from\|requires\|needs\|set\|export" "$README_FILE"
 - **Copy-paste ready** - Examples should run with proper setup
 - **Document usage, not just API** - Show "how" not just "what"
 - **Match the codebase** - Follow existing patterns and conventions
+- **Concise signatures** - Function signatures should be readable, showing only important parameters and defaults
 
 ## Example Transformation
 
@@ -373,9 +608,9 @@ result = processor.process(data)  # 'data' undefined
 
 ### After (Good)
 ```python
-# Component section - Function signature
+# Component section - Concise function signature
 **Key Functions:**
-- `process(data: str, config: dict) -> Result` - Process data with configuration
+- `process(data, options=None)` - Process data with optional configuration
 
 # Usage Examples section - Complete working example
 from mypackage import Processor
@@ -401,7 +636,7 @@ finally:
 
 ### Python
 - Show virtual environment setup if needed
-- Include type hints in function signatures
+- **Use concise function signatures** - Show parameter names and defaults, omit detailed type hints
 - Show proper exception handling
 - Include resource cleanup (context managers, try/finally)
 
@@ -429,5 +664,6 @@ finally:
 - When in doubt, look at similar READMEs in the repo for patterns
 - Test code examples when possible to ensure they work
 - Prioritize functional examples over isolated snippets
-- Show both API reference (function signatures) and usage examples (complete code)
+- Show both API reference (concise function signatures) and usage examples (complete code)
 - Consider the target audience - beginners need more context, experts need concise examples
+- **Function signatures should be concise** - Focus on readability by showing only important parameters and defaults, not full type annotations

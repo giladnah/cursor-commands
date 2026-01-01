@@ -1,18 +1,19 @@
 # Cursor IDE files
 debug.log
 worktrees.json
-*.log
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# IDE files
+.vscode/
+.idea/
 
 # OS files
 .DS_Store
 Thumbs.db
-
-# Backup files
-*~
-*.bak
-*.swp
-
-# Temporary files
-*.tmp
-.cache/
 
