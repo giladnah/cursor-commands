@@ -1,5 +1,16 @@
 # Changelog
 
+## 2025-01-18 - Repository Cleanup and Documentation Fixes
+
+### Cleanup
+- **Removed duplicate files**: Deleted outdated `commands/README.md`, `commands/SETUP_GITHUB.md`, `commands/CHANGELOG.md`, and `commands/tools/README.md`
+- **Removed temporary files**: Cleaned up `debug.log` and `worktrees.json` (already gitignored)
+- **Fixed path references**: Updated all documentation to use correct paths (`tools/` not `commands/tools/`)
+
+### Fixed
+- **Path references**: Corrected tool path in CHANGELOG and review-application.md command documentation
+- **Documentation consistency**: Removed outdated references to symlinks and old repository structure
+
 ## 2025-01-18 - Repository Restructure: .cursor/ as Root
 
 ### Major Restructure
@@ -46,6 +57,6 @@
 
 **Direct tool usage:**
 ```bash
-python .cursor/commands/tools/application_review.py <app_path> [output_format]
+python .cursor/tools/application_review.py <app_path> [output_format]
 ```
 

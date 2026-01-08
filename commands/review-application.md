@@ -135,8 +135,8 @@ python .cursor/tools/application_review.py <app_path> [output_format]
 
 ### Tool Not Found
 If you get "tool not found" error:
-- Ensure `tools/application_review.py` exists in `.cursor/commands/tools/`
-- Check file permissions: `chmod +x .cursor/commands/tools/application_review.py`
+- Ensure `tools/application_review.py` exists in `.cursor/tools/`
+- Check file permissions: `chmod +x .cursor/tools/application_review.py`
 
 ### Import Errors
 If the tool reports import errors:
