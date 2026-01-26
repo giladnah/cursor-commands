@@ -68,6 +68,49 @@ python .cursor/tools/application_review.py \
 **Used by:**
 - `@review-application` command
 
+### arduino_upload.py
+
+Arduino upload tool for uploading sketches to Arduino Nano (CH340 clone) devices.
+
+**Direct Usage:**
+```bash
+# From project repository root:
+python .cursor/tools/arduino_upload.py <sketch_path> [port] [--compile-only]
+```
+
+**Parameters:**
+- `sketch_path` (required): Path to Arduino sketch directory or .ino file
+- `port` (optional): Serial port (e.g., /dev/ttyUSB0). Auto-detects if not specified
+- `--compile-only` (optional): Only compile, don't upload
+
+**Example:**
+```bash
+# Upload blink sketch (auto-detect port)
+python .cursor/tools/arduino_upload.py blink
+
+# Upload to specific port
+python .cursor/tools/arduino_upload.py blink /dev/ttyUSB0
+
+# Compile only
+python .cursor/tools/arduino_upload.py blink --compile-only
+```
+
+**Features:**
+- **Auto-installs arduino-cli on demand** to system PATH if not found
+- **Auto-installs Arduino AVR core on demand** if missing
+- Auto-detects Arduino port (checks common USB serial ports)
+- Uses old bootloader for CH340 compatibility
+- Clear error messages and troubleshooting tips
+- Supports compile-only mode
+
+**Requirements:**
+- arduino-cli (installed automatically on demand to system PATH)
+- Arduino AVR boards core (installed automatically on demand)
+- User in dialout group for serial port access
+
+**Used by:**
+- `@arduino-upload` command
+
 ## Tool Requirements
 
 Tools should be:
